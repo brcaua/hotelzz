@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { bookingDetails, getBookingsByGuestId, getGuestProfileById } from '@/data/guest-profiles'
+import { useBookingById } from '@/hooks/use-bookings'
 import { formatBookingId, formatDate, formatTime } from '@/lib/formatters'
 import { formatCurrency } from '@/lib/patterns'
 import { getPaymentStatusColor, getStatusColor } from '@/lib/status-styles'
@@ -75,7 +76,9 @@ function getMembershipColor(status: string) {
 export default function BookingDetailPage({ params }: { params: Promise<{ id: string }> }) {
   const { id } = use(params)
   
-  const booking = bookingDetails.find(b => b.id === id)
+  const storeBooking = useBookingById(id)
+  const staticBooking = bookingDetails.find(b => b.id === id)
+  const booking = storeBooking || staticBooking
   
   if (!booking) {
     notFound()

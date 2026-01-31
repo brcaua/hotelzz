@@ -75,7 +75,7 @@ export function BookingsBreakdown() {
           </div>
         </div>
 
-        <div className="group flex items-center gap-3 rounded-xl border border-primary/10 bg-gradient-to-r from-emerald-50/80 to-teal-50/80 px-4 py-3 transition-all hover:border-primary/20 hover:shadow-sm">
+        <div className="group flex items-center gap-3 rounded-xl border border-primary/10 bg-gradient-to-r from-emerald-50/80 to-teal-50/80 dark:from-emerald-950/50 dark:to-teal-950/50 px-4 py-3 transition-all hover:border-primary/20 hover:shadow-sm">
           <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-primary/10">
             <Sparkles className="h-4 w-4 text-primary" />
           </div>
@@ -88,7 +88,7 @@ export function BookingsBreakdown() {
   }
 
   return (
-    <Card className="border-0 bg-white shadow-sm animate-fade-up animation-delay-400">
+    <Card className="border-0 bg-card shadow-sm dark:shadow-none dark:border dark:border-border/50 animate-fade-up animation-delay-400">
       <CardHeader className="flex flex-row items-center justify-between pb-2">
         <CardTitle className="font-display text-base font-semibold tracking-tight">Bookings</CardTitle>
         <Select defaultValue="monthly">

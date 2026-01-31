@@ -166,6 +166,14 @@
   background: #a3b0aa;
 }
 
+.dark ::-webkit-scrollbar-thumb {
+  background: #3d5a4d;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: #4d7a6d;
+}
+
 /* Smooth transitions */
 .transition-colors {
   transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
@@ -182,6 +190,11 @@
   transform: translateY(-2px);
   box-shadow: 0 12px 24px -8px rgba(5, 150, 105, 0.12),
               0 4px 8px -2px rgba(0, 0, 0, 0.04);
+}
+
+.dark .card-hover:hover {
+  box-shadow: 0 12px 24px -8px rgba(16, 185, 129, 0.15),
+              0 4px 8px -2px rgba(0, 0, 0, 0.2);
 }
 
 /* Staggered animation utilities */

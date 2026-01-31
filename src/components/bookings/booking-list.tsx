@@ -19,10 +19,18 @@ import {
   Plus,
   Search
 } from 'lucide-react'
+import dynamic from 'next/dynamic'
 import Link from 'next/link'
 import { useCallback, useMemo } from 'react'
 import { toast } from 'sonner'
-import { NewBookingDialog } from './new-booking-dialog'
+
+const NewBookingDialog = dynamic(
+  () => import('./new-booking-dialog').then(mod => ({ default: mod.NewBookingDialog })),
+  { 
+    loading: () => null,
+    ssr: false 
+  }
+)
 
 function filterBookings(bookings: BookingDetails[], query: string): BookingDetails[] {
   if (!query) return bookings

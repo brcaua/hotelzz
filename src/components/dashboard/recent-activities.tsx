@@ -76,7 +76,7 @@ export function RecentActivities() {
   }
 
   return (
-    <Card className="border-0 bg-white shadow-sm animate-fade-up animation-delay-500">
+    <Card className="border-0 bg-card shadow-sm dark:shadow-none dark:border dark:border-border/50 animate-fade-up animation-delay-500">
       <CardHeader className="flex flex-row items-center justify-between pb-4">
         <CardTitle className="font-display text-base font-semibold tracking-tight">
           Recent activities

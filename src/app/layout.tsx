@@ -2,6 +2,9 @@ import type { Metadata } from "next";
 import { Outfit, Source_Sans_3 } from "next/font/google";
 import "./globals.css";
 import { QueryProvider } from "@/lib/query-provider";
+import { ThemeProvider } from "@/components/theme-provider";
+import { ErrorBoundary } from "@/components/error-boundary";
+import { CommandPalette } from "@/components/command-palette";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
 import { Toaster } from "@/components/ui/sonner";
@@ -29,22 +32,27 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <body
         className={`${outfit.variable} ${sourceSans.variable} font-sans antialiased`}
       >
-        <QueryProvider>
-          <div className="flex min-h-screen bg-slate-50/50">
-            <Sidebar />
-            <main className="ml-64 flex-1">
-              <Header />
-              <div className="p-8">
-                {children}
-              </div>
-            </main>
-          </div>
-          <Toaster position="top-right" richColors closeButton />
-        </QueryProvider>
+        <ThemeProvider defaultTheme="system" storageKey="hotel-dashboard-theme">
+          <QueryProvider>
+            <div className="flex min-h-screen bg-slate-50/50 dark:bg-slate-950">
+              <Sidebar />
+              <main className="ml-64 flex-1">
+                <Header />
+                <div className="p-8">
+                  <ErrorBoundary>
+                    {children}
+                  </ErrorBoundary>
+                </div>
+              </main>
+            </div>
+            <Toaster position="top-right" richColors closeButton />
+            <CommandPalette />
+          </QueryProvider>
+        </ThemeProvider>
       </body>
     </html>
   );

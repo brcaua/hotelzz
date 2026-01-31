@@ -2,9 +2,13 @@
 
 import { Input } from '@/components/ui/input'
 import { Button } from '@/components/ui/button'
+import { ThemeToggle } from '@/components/theme-toggle'
 import { Search, MessageSquare, Bell, Calendar } from 'lucide-react'
+import { useEffect, useRef } from 'react'
 
 export function Header() {
+  const searchInputRef = useRef<HTMLInputElement>(null)
+  
   const today = new Date()
   const formattedDate = today.toLocaleDateString('en-US', {
     weekday: 'long',
@@ -13,8 +17,23 @@ export function Header() {
     day: 'numeric'
   })
 
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault()
+        searchInputRef.current?.focus()
+      }
+      if (e.key === 'Escape') {
+        searchInputRef.current?.blur()
+      }
+    }
+
+    document.addEventListener('keydown', handleKeyDown)
+    return () => document.removeEventListener('keydown', handleKeyDown)
+  }, [])
+
   return (
-    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border/50 bg-white/80 px-8 backdrop-blur-sm">
+    <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-border/50 bg-white/80 dark:bg-slate-900/80 px-8 backdrop-blur-sm">
       <div className="flex items-center gap-4">
         <h1 className="font-display text-xl font-semibold tracking-tight text-foreground">
           Dashboard
@@ -29,10 +48,11 @@ export function Header() {
         <div className="relative">
           <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground/60" />
           <Input
+            ref={searchInputRef}
             placeholder="Search anything..."
-            className="w-72 rounded-xl border-border/50 bg-muted/30 pl-10 pr-14 text-sm transition-all duration-200 placeholder:text-muted-foreground/50 focus:bg-white focus:shadow-sm"
+            className="w-72 rounded-xl border-border/50 bg-muted/30 pl-10 pr-14 text-sm transition-all duration-200 placeholder:text-muted-foreground/50 focus:bg-white dark:focus:bg-slate-800 focus:shadow-sm"
           />
-          <kbd className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md border border-border/50 bg-white px-1.5 py-0.5 font-mono text-[10px] font-medium text-muted-foreground shadow-sm">
+          <kbd className="absolute right-3 top-1/2 -translate-y-1/2 rounded-md border border-border/50 bg-white dark:bg-slate-800 px-1.5 py-0.5 font-mono text-[10px] font-medium text-muted-foreground shadow-sm">
             ⌘K
           </kbd>
         </div>
@@ -40,6 +60,7 @@ export function Header() {
         <div className="h-8 w-px bg-border/50" />
 
         <div className="flex items-center gap-1">
+          <ThemeToggle />
           <Button
             variant="ghost"
             size="icon"

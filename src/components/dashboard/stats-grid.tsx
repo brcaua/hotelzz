@@ -16,7 +16,7 @@ export function StatsGrid() {
         {[1, 2, 3, 4].map((i) => (
           <div
             key={i}
-            className="h-[88px] animate-pulse rounded-xl bg-white/60"
+            className="h-[88px] animate-pulse rounded-xl bg-card/60 dark:bg-slate-800/60"
             style={{ animationDelay: `${i * 100}ms` }}
           />
         ))}
