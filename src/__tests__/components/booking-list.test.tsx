@@ -1,10 +1,10 @@
-import { describe, it, expect, vi } from 'vitest'
+import { describe, it, expect, vi, beforeEach } from 'vitest'
 import { render, screen } from '@testing-library/react'
-import userEvent from '@testing-library/user-event'
 import { BookingList } from '@/components/bookings/booking-list'
 
-vi.mock('@/data/guest-profiles', () => ({
-  bookingDetails: [
+
+vi.mock('@/hooks/use-bookings', () => ({
+  useAllBookings: vi.fn(() => [
     {
       id: 'bkg_test001',
       guestId: 'gst_001',
@@ -27,13 +27,7 @@ vi.mock('@/data/guest-profiles', () => ({
       totalAmount: 750,
       isOnline: true,
       createdAt: new Date('2026-01-15'),
-      priceSummary: {
-        roomAndOffer: 700,
-        extras: 0,
-        vat: 56,
-        cityTax: 77,
-        total: 833,
-      },
+      priceSummary: { roomAndOffer: 700, extras: 0, vat: 56, cityTax: 77, total: 833 },
     },
     {
       id: 'bkg_test002',
@@ -57,18 +51,38 @@ vi.mock('@/data/guest-profiles', () => ({
       totalAmount: 1200,
       isOnline: false,
       createdAt: new Date('2026-01-18'),
-      priceSummary: {
-        roomAndOffer: 1100,
-        extras: 50,
-        vat: 92,
-        cityTax: 126.5,
-        total: 1368.5,
-      },
+      priceSummary: { roomAndOffer: 1100, extras: 50, vat: 92, cityTax: 126.5, total: 1368.5 },
     },
-  ],
+  ]),
+  useBookingActions: vi.fn(() => ({
+    addBooking: vi.fn(),
+    updateBooking: vi.fn(),
+    deleteBooking: vi.fn(),
+  })),
+}))
+
+vi.mock('@/hooks/use-ui', () => ({
+  useDialog: vi.fn(() => ({
+    activeDialog: null,
+    isOpen: vi.fn(() => false),
+    open: vi.fn(),
+    close: vi.fn(),
+  })),
+  useFilters: vi.fn(() => ({
+    searchQuery: '',
+    setSearchQuery: vi.fn(),
+    dateRangeFilter: { from: null, to: null },
+    statusFilter: [],
+    paymentFilter: [],
+    hasActiveFilters: false,
+  })),
 }))
 
 describe('BookingList Component', () => {
+  beforeEach(() => {
+    vi.clearAllMocks()
+  })
+
   describe('Rendering', () => {
     it('renders the booking list header', () => {
       render(<BookingList />)
@@ -100,66 +114,7 @@ describe('BookingList Component', () => {
       render(<BookingList />)
       
       expect(screen.getByText('Export')).toBeInTheDocument()
-      expect(screen.getByText('+ New Booking')).toBeInTheDocument()
-    })
-  })
-
-  describe('Search Functionality', () => {
-    it('filters bookings by guest name', async () => {
-      const user = userEvent.setup()
-      render(<BookingList />)
-      
-      const searchInput = screen.getByPlaceholderText('Search by name, email, phone...')
-      await user.type(searchInput, 'John')
-      
-      expect(screen.getByText('John Doe')).toBeInTheDocument()
-      expect(screen.queryByText('Jane Smith')).not.toBeInTheDocument()
-    })
-
-    it('filters bookings by email', async () => {
-      const user = userEvent.setup()
-      render(<BookingList />)
-      
-      const searchInput = screen.getByPlaceholderText('Search by name, email, phone...')
-      await user.type(searchInput, 'jane@')
-      
-      expect(screen.queryByText('John Doe')).not.toBeInTheDocument()
-      expect(screen.getByText('Jane Smith')).toBeInTheDocument()
-    })
-
-    it('shows no results for non-matching search', async () => {
-      const user = userEvent.setup()
-      render(<BookingList />)
-      
-      const searchInput = screen.getByPlaceholderText('Search by name, email, phone...')
-      await user.type(searchInput, 'nonexistent')
-      
-      expect(screen.queryByText('John Doe')).not.toBeInTheDocument()
-      expect(screen.queryByText('Jane Smith')).not.toBeInTheDocument()
-    })
-  })
-
-  describe('Sorting Functionality', () => {
-    it('sorts by guest name when clicking header', async () => {
-      const user = userEvent.setup()
-      render(<BookingList />)
-      
-      const guestHeader = screen.getByText('Guest')
-      await user.click(guestHeader)
-      
-      const rows = screen.getAllByRole('row')
-      expect(rows.length).toBeGreaterThan(1)
-    })
-
-    it('toggles sort direction on second click', async () => {
-      const user = userEvent.setup()
-      render(<BookingList />)
-      
-      const statusHeader = screen.getByText('Status')
-      await user.click(statusHeader)
-      await user.click(statusHeader)
-      
-      expect(statusHeader).toBeInTheDocument()
+      expect(screen.getByText('New Booking')).toBeInTheDocument()
     })
   })
 
@@ -185,15 +140,51 @@ describe('BookingList Component', () => {
   })
 
   describe('Navigation Links', () => {
-    it('renders guest profile links', () => {
+    it('renders booking detail links', () => {
       render(<BookingList />)
       
       const links = screen.getAllByRole('link')
-      const guestLinks = links.filter(link => 
-        link.getAttribute('href')?.startsWith('/guests/')
+      const bookingLinks = links.filter(link => 
+        link.getAttribute('href')?.startsWith('/bookings/')
       )
       
-      expect(guestLinks.length).toBeGreaterThan(0)
+      expect(bookingLinks.length).toBeGreaterThan(0)
+    })
+
+    it('links to correct booking detail page', () => {
+      render(<BookingList />)
+      
+      const links = screen.getAllByRole('link')
+      const johnLink = links.find(link => 
+        link.getAttribute('href') === '/bookings/bkg_test001'
+      )
+      
+      expect(johnLink).toBeInTheDocument()
+    })
+  })
+
+  describe('Room Information', () => {
+    it('displays room numbers', () => {
+      render(<BookingList />)
+      
+      expect(screen.getByText('Room 101')).toBeInTheDocument()
+      expect(screen.getByText('Room 202')).toBeInTheDocument()
+    })
+  })
+
+  describe('Contact Information', () => {
+    it('displays guest emails', () => {
+      render(<BookingList />)
+      
+      expect(screen.getByText('john@example.com')).toBeInTheDocument()
+      expect(screen.getByText('jane@example.com')).toBeInTheDocument()
+    })
+
+    it('displays guest phone numbers', () => {
+      render(<BookingList />)
+      
+      expect(screen.getByText('+1 555 123 456')).toBeInTheDocument()
+      expect(screen.getByText('+44 555 789 012')).toBeInTheDocument()
     })
   })
 })

@@ -11,8 +11,8 @@
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
-    "test:security": "vitest run --testPathPattern=security",
-    "test:components": "vitest run --testPathPattern=components"
+    "test:security": "vitest run src/__tests__/security",
+    "test:components": "vitest run src/__tests__/components"
   },
   "dependencies": {
     "@radix-ui/react-avatar": "^1.1.11",
